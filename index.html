@@ -10,11 +10,10 @@
 
 <style>
 :root{
-  --glass: rgba(255, 255, 255, 0.1);
-  --border: rgba(255, 255, 255, 0.2);
+  --glass: rgba(255, 255, 255, 0.15);
+  --border: rgba(255, 255, 255, 0.3);
   --primary: #ff2e63; /* Vibrant Pink */
   --secondary: #08d9d6; /* Vibrant Cyan */
-  --bg-dark: #1a1a2e;
 }
 
 *{box-sizing:border-box}
@@ -24,25 +23,28 @@ body{
   overflow:hidden;
   color:#fff;
   height: 100vh;
-  /* VIBRANT ANIMATED BACKGROUND */
-  background: linear-gradient(-45deg, #ee7752, #862ee4, #23a6d5, #23d5ab);
-  background-size: 400% 400%;
-  animation: gradientBG 15s ease infinite;
+  /* --- NEW IMAGE BACKGROUND SETUP --- */
+  /* Default starting image */
+  background-image: url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* Smooth transition when image changes */
+  transition: background-image 0.5s ease-in-out;
 }
 
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Dark overlay pattern to retain readability */
+/* --- DARK OVERLAY FOR READABILITY --- */
+/* This ensures text pops regardless of the background image brightness */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
+    /* A dark blue/black tint over the image */
+    background-color: rgba(10, 20, 40, 0.7);
+    /* Subtle pattern overlaid */
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     z-index: -1;
+    backdrop-filter: blur(2px);
 }
 
 /* --- SCENE LAYOUT --- */
@@ -54,6 +56,8 @@ body::before {
   align-items:center;
   perspective:1200px;
   gap: 30px;
+  /* Ensure clicks register on the scene for BG change */
+  cursor: pointer; 
 }
 
 /* --- 3D CARD --- */
@@ -64,8 +68,9 @@ body::before {
   transform-style:preserve-3d;
   transition:transform 0.8s cubic-bezier(.2, .8, .2, 1);
   cursor:pointer;
+  /* Stop propagation so clicking card doesn't change BG too rapidly */
 }
-.card:hover{
+.card:hover, .card.flipped{
   transform:rotateY(180deg);
 }
 
@@ -77,14 +82,13 @@ body::before {
   padding:25px;
   
   /* PREMIUM GLASSMORPHISM */
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--glass);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--border);
   box-shadow: 
-    0 15px 35px rgba(0,0,0,0.2),
-    0 5px 15px rgba(0,0,0,0.1),
-    inset 0 0 20px rgba(255,255,255,0.1);
+    0 15px 35px rgba(0,0,0,0.3),
+    inset 0 0 20px rgba(255,255,255,0.05);
 }
 
 /* FRONT DESIGN */
@@ -120,7 +124,7 @@ body::before {
 .back{ 
   transform:rotateY(180deg); 
   display:flex; flex-direction:column; justify-content:center; 
-  background: rgba(0, 0, 0, 0.4); /* Slightly darker back for contrast */
+  background: rgba(0, 0, 0, 0.6); /* Darker back for contrast */
 }
 .back h3{ 
   margin:0 0 15px 0; 
@@ -146,6 +150,7 @@ body::before {
     display: flex;
     gap: 15px;
     z-index: 10;
+    cursor: default; /* Reset cursor here so buttons don't feel like BG changers */
 }
 
 .btn {
@@ -162,20 +167,16 @@ body::before {
     background: #fff;
     color: #333;
     font-weight: 700;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
 .btn i { font-size: 20px; }
-
-/* Website & LinkedIn (Icon Squares) */
 .btn-icon { width: 54px; }
 .btn-icon:hover { transform: translateY(-3px) scale(1.05); }
-
-/* Custom Colors */
 .btn-web { color: #333; }
-.btn-li { color: #0077b5; } /* LinkedIn Blue */
+.btn-li { color: #0077b5; } 
+.btn-email { color: #ea4335; }
 
-/* Save Contact (Main Button) */
 .btn-save {
     padding: 0 30px;
     background: #111;
@@ -185,7 +186,7 @@ body::before {
 .btn-save:hover {
     transform: translateY(-3px);
     background: #000;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
 }
 
 .cta-text{
@@ -194,17 +195,19 @@ body::before {
   width:100%;
   text-align:center;
   font-size:12px;
-  opacity: 0.7;
+  opacity: 0.8;
   letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  pointer-events: none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="scene">
+<div class="scene" onclick="changeBackground()">
   
-  <div class="card" onclick="this.classList.toggle('flipped')">
+  <div class="card" onclick="event.stopPropagation(); this.classList.toggle('flipped')">
     <div class="face front">
       <div>
         <h2>Sumit Bhoyar</h2>
@@ -229,7 +232,7 @@ body::before {
     </div>
   </div>
 
-  <div class="controls-container">
+  <div class="controls-container" onclick="event.stopPropagation()">
     
     <a href="https://www.buildtek.in" target="_blank" class="btn btn-icon btn-web" title="Visit Website">
       <i class="fa-solid fa-globe"></i>
@@ -253,13 +256,35 @@ body::before {
 </div>
 
 <div class="cta-text">
-  Hover / Tap card to flip
+  Tap card to flip • Tap background to change view
 </div>
 
 <script>
+// --- BACKGROUND CHANGER FUNCTIONALITY ---
+
+// 1. Array of background images (Construction/Tech/City themes)
+const bgImages = [
+    'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1920&q=80', // City sunset (Default)
+    'https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?auto=format&fit=crop&w=1920&q=80', // Dark Tech Blueprint
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80', // Modern Skyscrapers looking up
+    'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1920&q=80', // Construction crane sunset
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80'  // Circuit board tech
+];
+
+let currentBgIndex = 0;
+
+// 2. Function to cycle background
+function changeBackground() {
+    // Increment index, loop back to 0 if at the end
+    currentBgIndex = (currentBgIndex + 1) % bgImages.length;
+    
+    // Update body background image
+    document.body.style.backgroundImage = `url('${bgImages[currentBgIndex]}')`;
+}
+
+
+// --- CONTACT DOWNLOAD FUNCTIONALITY (UNCHANGED) ---
 function downloadContact() {
-    // 1. Define the vCard Data
-    // Note: The format must be exact for Outlook/Android to read it.
     const vCardData = [
         "BEGIN:VCARD",
         "VERSION:3.0",
@@ -274,20 +299,13 @@ function downloadContact() {
         "END:VCARD"
     ].join("\n");
 
-    // 2. Create a blob for the file
     const blob = new Blob([vCardData], { type: "text/vcard" });
     const url = URL.createObjectURL(blob);
-
-    // 3. Create a temporary link to trigger download
     const newLink = document.createElement('a');
     newLink.download = "Sumit_Bhoyar.vcf";
     newLink.textContent = "Sumit Bhoyar";
     newLink.href = url;
-    
-    // 4. Trigger click
     newLink.click();
-    
-    // 5. Cleanup
     URL.revokeObjectURL(url);
 }
 </script>
